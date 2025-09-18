@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tcosfish.xianyu.mapper.NegotiationMapper">
+
+    <resultMap id="BaseResultMap" type="com.tcosfish.xianyu.model.entity.Negotiation">
+            <id property="id" column="id" />
+            <result property="itemId" column="item_id" />
+            <result property="buyerId" column="buyer_id" />
+            <result property="sellerId" column="seller_id" />
+            <result property="price" column="price" />
+            <result property="status" column="status" />
+            <result property="round" column="round" />
+            <result property="message" column="message" />
+            <result property="expireAt" column="expire_at" />
+            <result property="deleted" column="deleted" />
+            <result property="createtime" column="createtime" />
+            <result property="updatetime" column="updatetime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,item_id,buyer_id,seller_id,price,status,
+        round,message,expire_at,deleted,createtime,
+        updatetime
+    </sql>
+</mapper>

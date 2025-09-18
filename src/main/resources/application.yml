@@ -1,0 +1,115 @@
+spring:
+  profiles:
+    active: dev   # 设置当前环境
+  application:
+    name: xianyu
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver  # 数据库驱动
+    url: jdbc:mysql://localhost:3306/xianyu?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    # 数据库用户名，占位符，避免上传敏感信息
+    username: ${DB_USERNAME}
+    # 数据库密码，占位符，避免上传敏感信息
+    password: ${DB_PASSWORD}
+  lifecycle:
+    timeout-per-shutdown-phase: 30s  # 给业务线程足够的优雅时间
+  data:
+    redis:
+      host: ${REDIS_HOST}  # Redis主机
+      port: ${REDIS_PORT}  # Redis端口
+      database: 0
+      timeout: 350000
+      jedis:
+        pool:
+          enabled: on
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 2000
+  mail:
+    host: smtp.qq.com  # 邮件服务器
+    port: 465  # 邮件端口
+    username: ${MAIL_USERNAME}  # 邮箱账号，占位符
+    password: ${MAIL_PASSWORD}  # 邮箱密码，占位符
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+          socketFactory:
+            port: 465
+            class: javax.net.ssl.SSLSocketFactory
+    protocol: smtps
+    default-encoding: UTF-8
+  sql:
+    # auto-create database
+    init:
+      mode: never
+      encoding: UTF-8
+      schema-locations:
+        - classpath:db/schema/user.sql
+        - classpath:db/schema/role.sql
+      data-locations:
+        - classpath:db/data/data.sql
+  main:
+    banner-mode: off  # 关闭启动Banner
+  security:
+    user:
+      name: ${SPRING_SECURITY_USER}  # 默认用户名，占位符
+      password: ${SPRING_SECURITY_PASSWORD}  # 默认密码，占位符
+      roles: ADMIN
+
+server:
+  port: 8848
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl  # SQL日志输出
+  global-config:
+    db-config:
+      id-type: auto  # 主键策略
+      logic-delete-field: deleted  # 逻辑删除字段
+      logic-delete-value: 1  # 逻辑删除值
+      logic-not-delete-value: 0  # 逻辑未删除值
+    banner: false
+  type-aliases-package: com.demo.entity
+  mapper-locations: classpath:/mapper/**/*.xml
+  lazy-initialization: true
+
+springdoc:
+  api-docs:
+    enabled: true                  # 启用/禁用API文档访问
+    path: /v3/api-docs             # API文档访问路径
+  swagger-ui:
+    path: /swagger-ui.html         # Swagger UI访问路径
+    disable-swagger-default-url: true
+    display-request-duration: true  # 显示请求持续时间
+  packages-to-scan: com.tcosfish.xianyu.controller  # 扫描Controller包
+
+mail:
+  verify-code:
+    expire-minutes: 15  # 验证码过期分钟数
+    limit-expire-seconds: 60  # 最少保存秒数
+    template-path: "mail/verify-code.html"  # 邮件模板
+
+upload:
+  # 上传文件存储路径
+  path: ${USER_DIR}/tmp/uploads
+  url-prefix: http://localhost:${server.port}/images  # 文件访问URL前缀
+
+# JWT 配置
+jwt:
+  # HS512 算法密钥，占位符，避免上传真实密钥
+  secret: ${JWT_SECRET}
+  expiration: 2592000  # 有效期，单位秒
+
+# 阿里云沙箱配置
+alipay:
+  appId: ${ALIPAY_APPID}  # 支付宝应用ID
+  # 私钥，占位符，避免上传真实密钥
+  privateKey: ${ALIPAY_PRIVATE_KEY}
+  # 公钥，占位符
+  publicKey: ${ALIPAY_PUBLIC_KEY}
+  notifyUrl: ${ALIPAY_NOTIFY_URL}  # 异步回调地址
+  returnUrl: ${ALIPAY_RETURN_URL}  # 同步返回地址
+  gatewayUrl: ${ALIPAY_GATEWAY_URL}  # 网关URL

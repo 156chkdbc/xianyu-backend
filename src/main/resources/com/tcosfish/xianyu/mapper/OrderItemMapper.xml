@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tcosfish.xianyu.mapper.OrderItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.tcosfish.xianyu.model.entity.OrderItem">
+            <id property="id" column="id" />
+            <result property="orderId" column="order_id" />
+            <result property="itemType" column="item_type" />
+            <result property="itemId" column="item_id" />
+            <result property="itemTitle" column="item_title" />
+            <result property="unitPrice" column="unit_price" />
+            <result property="quantity" column="quantity" />
+            <result property="amount" column="amount" />
+            <result property="createtime" column="createtime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,order_id,item_type,item_id,item_title,unit_price,
+        quantity,amount,createtime
+    </sql>
+</mapper>

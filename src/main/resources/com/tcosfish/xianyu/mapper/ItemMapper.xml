@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tcosfish.xianyu.mapper.ItemMapper">
+
+    <resultMap id="BaseResultMap" type="com.tcosfish.xianyu.model.entity.Item">
+            <id property="id" column="id" />
+            <result property="sellerId" column="seller_id" />
+            <result property="categoryId" column="category_id" />
+            <result property="title" column="title" />
+            <result property="description" column="description" />
+            <result property="price" column="price" />
+            <result property="unit" column="unit" />
+            <result property="stock" column="stock" />
+            <result property="negotiable" column="negotiable" />
+            <result property="itemType" column="item_type" />
+            <result property="status" column="status" />
+            <result property="viewCount" column="view_count" />
+            <result property="deleted" column="deleted" />
+            <result property="createtime" column="createtime" />
+            <result property="updatetime" column="updatetime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,seller_id,category_id,title,description,price,
+        unit,stock,negotiable,item_type,status,
+        view_count,deleted,createtime,updatetime
+    </sql>
+
+    <!-- ItemMapper.xml -->
+    <resultMap id="ProductDtoMap" type="com.tcosfish.xianyu.model.dto.product.ProductDto">
+        <result column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="description" property="description"/>
+        <result column="price" property="price"/>
+        <result column="unit" property="unit"/>
+        <result column="stock" property="stock"/>
+        <result column="negotiable" property="negotiable"/>
+        <result column="item_type" property="itemType"/>
+        <result column="status" property="status"/>
+        <result column="view_count" property="viewCount"/>
+        <result column="create_time" property="createtime"/>
+        <result column="seller_nick" property="sellerNick"/>
+        <result column="seller_avatar" property="sellerAvatar"/>
+    </resultMap>
+
+    <select id="selectProductDtoPage" resultMap="ProductDtoMap">
+        SELECT
+        i.id,
+        i.title,
+        i.description,
+        i.price,
+        i.unit,
+        i.stock,
+        i.negotiable,
+        i.item_type,
+        i.status,
+        i.view_count,
+        i.createtime AS create_time,
+        u.username AS seller_nick,
+        up.avatar AS seller_avatar
+        FROM item i
+        JOIN user u ON i.seller_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        <where>
+            i.deleted != 1
+            <if test="q.sellerId != null"> AND i.seller_id = #{q.sellerId} </if>
+            <if test="q.categoryId != null"> AND i.category_id = #{q.categoryId} </if>
+            <if test="q.itemType != null"> AND i.item_type = #{q.itemType} </if>
+            <if test="q.negotiable != null"> AND i.negotiable = #{q.negotiable} </if>
+            <if test="q.title != null and q.title != ''"> AND i.title LIKE CONCAT('%', #{q.title}, '%') </if>
+        </where>
+        <choose>
+            <when test="q.orderByColumn != null and q.orderByColumn != ''">
+                ORDER BY ${q.orderByColumn}
+                <if test="q.isAsc != null and q.isAsc == false"> DESC </if>
+            </when>
+            <otherwise> ORDER BY i.id DESC </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectProductDtoById" resultType="com.tcosfish.xianyu.model.dto.product.ProductDto">
+        SELECT
+        i.id,
+        i.title,
+        i.description,
+        i.price,
+        i.unit,
+        i.stock,
+        i.negotiable,
+        i.item_type,
+        i.status,
+        i.view_count,
+        i.createtime AS create_time,
+        u.username AS seller_nick,
+        up.avatar AS seller_avatar
+        FROM item i
+        JOIN user u ON i.seller_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        WHERE i.deleted != 1
+        AND i.id = #{productId}
+    </select>
+
+    <select id="search" resultMap="ProductDtoMap">
+        SELECT
+        i.id,
+        i.title,
+        i.description,
+        i.price,
+        i.unit,
+        i.stock,
+        i.negotiable,
+        i.item_type,
+        i.status,
+        i.view_count,
+        i.createtime   AS create_time,
+        u.username     AS seller_nick,
+        up.avatar      AS seller_avatar,
+        <!-- 关键词得分 -->
+        <choose>
+            <when test="q.keyword != null and q.keyword != ''">
+                MATCH(i.title, i.description) AGAINST(#{q.keyword} IN NATURAL LANGUAGE MODE)
+            </when>
+            <otherwise>0</otherwise>
+        </choose> AS score
+        FROM item i
+        JOIN user u  ON i.seller_id = u.id
+        JOIN user_profile up ON u.id = up.user_id
+        <where>
+            i.deleted = 0
+            AND i.status = 1
+            <!-- 1. 全文关键词 -->
+            <if test="q.keyword != null and q.keyword != ''">
+                AND MATCH(i.title, i.description) AGAINST(#{q.keyword} IN NATURAL LANGUAGE MODE)
+            </if>
+            <!-- 2. 等值过滤 -->
+            <if test="q.sellerId != null">      AND i.seller_id   = #{q.sellerId} </if>
+            <if test="q.categoryId != null">    AND i.category_id = #{q.categoryId} </if>
+            <if test="q.itemType != null">      AND i.item_type   = #{q.itemType} </if>
+            <if test="q.negotiable != null">    AND i.negotiable  = #{q.negotiable} </if>
+            <!-- 3. 价格区间 BETWEEN -->
+            <if test="q.priceFrom != null and q.priceTo != null">
+                AND i.price BETWEEN #{q.priceFrom} AND #{q.priceTo}
+            </if>
+            <if test="q.priceFrom != null and q.priceTo == null">
+                AND i.price <![CDATA[>=]]> #{q.priceFrom}
+            </if>
+            <if test="q.priceFrom == null and q.priceTo != null">
+                AND i.price <![CDATA[<=]]> #{q.priceTo}
+            </if>
+        </where>
+        <!-- 4. 排序 -->
+        <choose>
+            <when test="q.keyword != null and q.keyword != ''">
+                ORDER BY score DESC, i.createtime DESC
+            </when>
+            <when test="q.orderByColumn != null and q.orderByColumn != ''">
+                ORDER BY ${q.orderByColumn}
+                <if test="q.isAsc != null and q.isAsc == false"> DESC</if>
+            </when>
+            <otherwise>ORDER BY i.id DESC</otherwise>
+        </choose>
+    </select>
+</mapper>

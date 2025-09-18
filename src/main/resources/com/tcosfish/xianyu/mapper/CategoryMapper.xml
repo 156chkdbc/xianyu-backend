@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tcosfish.xianyu.mapper.CategoryMapper">
+
+    <resultMap id="BaseResultMap" type="com.tcosfish.xianyu.model.entity.Category">
+            <id property="id" column="id" />
+            <result property="parentId" column="parent_id" />
+            <result property="name" column="name" />
+            <result property="level" column="level" />
+            <result property="deleted" column="deleted" />
+            <result property="createtime" column="createtime" />
+            <result property="updatetime" column="updatetime" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,parent_id,name,level,deleted,createtime,
+        updatetime
+    </sql>
+</mapper>

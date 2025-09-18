@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tcosfish.xianyu.mapper.TraceLogRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.tcosfish.xianyu.model.entity.TraceLogRecord">
+            <id property="id" column="id" />
+            <result property="traceId" column="trace_id" />
+            <result property="userId" column="user_id" />
+            <result property="ip" column="ip" />
+            <result property="clazz" column="clazz" />
+            <result property="method" column="method" />
+            <result property="description" column="description" />
+            <result property="params" column="params" />
+            <result property="result" column="result" />
+            <result property="success" column="success" />
+            <result property="errMsg" column="err_msg" />
+            <result property="cost" column="cost" />
+            <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,trace_id,user_id,ip,clazz,method,
+        description,params,result,success,err_msg,
+        cost,create_time
+    </sql>
+</mapper>
