@@ -29,7 +29,7 @@ import com.tcosfish.xianyu.model.vo.product.ItemStatusEnum;
 import com.tcosfish.xianyu.scope.RequestScopeData;
 import com.tcosfish.xianyu.mapper.OrderMapper;
 import com.tcosfish.xianyu.utils.ApiResponseUtil;
-import com.tcosfish.xianyu.utils.SimpleSnowflakeUtil;
+import com.tcosfish.xianyu.utils.RandomCodeUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -198,7 +198,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order>
     }
     // 生成订单
     Order order = Order.builder()
-      .orderNo(SimpleSnowflakeUtil.generateOrderNo()) // 雪花算法生成订单号
+      .orderNo(RandomCodeUtil.generateNumberCode(10)) // 雪花算法生成订单号
       .buyerId(userId).sellerId(item.getSellerId())
       .orderType(OrderTypeEnum.of(item.getItemType())) // 商品/服务
       .totalAmount(item.getPrice().multiply(BigDecimal.valueOf(quantity)))
